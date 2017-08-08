@@ -32,7 +32,8 @@
 #include <sys/kmem.h>
 #include <sys/mutex.h>
 
-#define KSTAT_STRLEN            31
+#define KSTAT_STRLEN		31
+#define KSTAT_MOD_STRLEN	255	/* Support large pool names */
 #define KSTAT_RAW_MAX		(128*1024)
 
 /* For reference valid classes are:
@@ -85,10 +86,10 @@ typedef int kid_t;                                  /* unique kstat id */
 typedef int kstat_update_t(struct kstat_s *, int);  /* dynamic update cb */
 
 typedef struct kstat_module {
-	char             ksm_name[KSTAT_STRLEN+1];  /* module name */
-	struct list_head ksm_module_list;           /* module linkage */
-	struct list_head ksm_kstat_list;            /* list of kstat entries */
-	struct proc_dir_entry *ksm_proc;            /* proc entry */
+	char		ksm_name[KSTAT_MOD_STRLEN+1];	/* module name */
+	struct list_head ksm_module_list;           	/* module linkage */
+	struct list_head ksm_kstat_list;            	/* list of kstat entries */
+	struct proc_dir_entry *ksm_proc;            	/* proc entry */
 } kstat_module_t;
 
 typedef struct kstat_raw_ops {
@@ -98,29 +99,29 @@ typedef struct kstat_raw_ops {
 } kstat_raw_ops_t;
 
 struct kstat_s {
-	int              ks_magic;                  /* magic value */
-        kid_t            ks_kid;                    /* unique kstat ID */
-        hrtime_t         ks_crtime;                 /* creation time */
-	hrtime_t         ks_snaptime;               /* last access time */
-        char             ks_module[KSTAT_STRLEN+1]; /* provider module name */
-        int              ks_instance;               /* provider module instance */
-        char             ks_name[KSTAT_STRLEN+1];   /* kstat name */
-        char             ks_class[KSTAT_STRLEN+1];  /* kstat class */
-        uchar_t          ks_type;                   /* kstat data type */
-        uchar_t          ks_flags;                  /* kstat flags */
-        void             *ks_data;                  /* kstat type-specific data */
-        uint_t           ks_ndata;                  /* # of type-specific data records */
-        size_t           ks_data_size;              /* size of kstat data section */
-        struct proc_dir_entry *ks_proc;             /* proc linkage */
-        kstat_update_t   *ks_update;                /* dynamic updates */
-        void             *ks_private;               /* private data */
-	kmutex_t         ks_private_lock;           /* kstat private data lock */
-	kmutex_t         *ks_lock;                  /* kstat data lock */
-        struct list_head ks_list;                   /* kstat linkage */
-	kstat_module_t   *ks_owner;                 /* kstat module linkage */
-	kstat_raw_ops_t  ks_raw_ops;                /* ops table for raw type */
-	char             *ks_raw_buf;               /* buf used for raw ops */
-	size_t           ks_raw_bufsize;            /* size of raw ops buffer */
+	int              ks_magic;                  	/* magic value */
+        kid_t            ks_kid;                    	/* unique kstat ID */
+        hrtime_t         ks_crtime;                 	/* creation time */
+	hrtime_t         ks_snaptime;               	/* last access time */
+        char             ks_module[KSTAT_MOD_STRLEN+1];	/* provider module name */
+        int              ks_instance;               	/* provider module instance */
+        char             ks_name[KSTAT_STRLEN+1];   	/* kstat name */
+        char             ks_class[KSTAT_STRLEN+1];  	/* kstat class */
+        uchar_t          ks_type;                   	/* kstat data type */
+        uchar_t          ks_flags;                  	/* kstat flags */
+        void             *ks_data;                  	/* kstat type-specific data */
+        uint_t           ks_ndata;                  	/* # of type-specific data records */
+        size_t           ks_data_size;              	/* size of kstat data section */
+        struct proc_dir_entry *ks_proc;             	/* proc linkage */
+        kstat_update_t   *ks_update;                	/* dynamic updates */
+        void             *ks_private;               	/* private data */
+	kmutex_t         ks_private_lock;           	/* kstat private data lock */
+	kmutex_t         *ks_lock;                  	/* kstat data lock */
+        struct list_head ks_list;                   	/* kstat linkage */
+	kstat_module_t   *ks_owner;                 	/* kstat module linkage */
+	kstat_raw_ops_t  ks_raw_ops;                	/* ops table for raw type */
+	char             *ks_raw_buf;               	/* buf used for raw ops */
+	size_t           ks_raw_bufsize;            	/* size of raw ops buffer */
 };
 
 typedef struct kstat_named_s {

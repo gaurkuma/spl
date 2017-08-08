@@ -433,7 +433,7 @@ kstat_find_module(char *name)
 	kstat_module_t *module;
 
 	list_for_each_entry(module, &kstat_module_list, ksm_module_list)
-		if (strncmp(name, module->ksm_name, KSTAT_STRLEN) == 0)
+		if (strncmp(name, module->ksm_name, KSTAT_MOD_STRLEN) == 0)
 			return (module);
 
 	return (NULL);
@@ -451,7 +451,7 @@ kstat_create_module(char *name)
 
 	module = kmem_alloc(sizeof (kstat_module_t), KM_SLEEP);
 	module->ksm_proc = pde;
-	strlcpy(module->ksm_name, name, KSTAT_STRLEN+1);
+	strlcpy(module->ksm_name, name, KSTAT_MOD_STRLEN+1);
 	INIT_LIST_HEAD(&module->ksm_kstat_list);
 	list_add_tail(&module->ksm_module_list, &kstat_module_list);
 
@@ -625,6 +625,11 @@ kstat_detect_collision(kstat_t *ksp)
 	cp[0] = '\0';
 	if ((module = kstat_find_module(parent)) != NULL) {
 		list_for_each_entry(tmp, &module->ksm_kstat_list, ks_list)
+			/* Even though the module name can be really large,
+			 * (since the spa name can be greater than KSTAT_STRLEN),
+			 * we need not compare the entire string as the stats
+			 * name itself is limited to KSTAT_STRLEN
+			 */
 			if (strncmp(tmp->ks_name, cp+1, KSTAT_STRLEN) == 0)
 				return (EEXIST);
 	}
